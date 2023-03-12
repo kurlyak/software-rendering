@@ -13,4 +13,4 @@ Morphing_SoftRend The Win32 C++ project for Visual Studio 2019 demonstrates the 
 
 Sphere_Tex The Win32 C++ project for Visual Studio 2019 demonstrates the creation of sphere mesh, software triangles rasterization, texturing sphere mesh (used perspective correct texture mapping), backface culling (no OpenGL/DirectX).
 
-Lighted_Torus The Win32 C++ project for Visual Studio 2019 demonstrates the creation torus model, positional light source, gouraud shading, software triangles rasterization with interpolated colors, Z buffer usage (no OpenGL/DirectX).
+Torus_Lighted The Win32 C++ project for Visual Studio 2019 demonstrates the creation torus model, positional light source, gouraud shading, software triangles rasterization with interpolated colors, Z buffer usage (no OpenGL/DirectX).
