@@ -125,7 +125,8 @@ public:
 	CMeshManager();
 	~CMeshManager();
 
-	void Init_MeshManager(HWND hWnd) ;
+	void Init_MeshManager(HWND hWnd);
+	void Update_MeshManager();
 	void Draw_MeshManager();
 
 	void Create_BackBuffer();

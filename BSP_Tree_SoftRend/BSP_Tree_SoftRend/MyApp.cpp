@@ -112,6 +112,7 @@ int CMyApp::Program_Begin(HINSTANCE	hInstance, int nCmdShow)
 		if(GetKeyState(VK_ESCAPE) & 0xFF00)
 			break;
 
+		m_MeshManager.Update_MeshManager();
 		m_MeshManager.Draw_MeshManager();
 	}
 	

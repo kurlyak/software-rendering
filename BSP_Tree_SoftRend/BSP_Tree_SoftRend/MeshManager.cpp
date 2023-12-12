@@ -507,40 +507,46 @@ matrix4x4 CMeshManager::Get_View_Matrix()
 }
 
 //******************************************************
-//Функция трансформирует и отображает сцену на экране
+//Функция трансформирует сцену
 //******************************************************
-void CMeshManager::Draw_MeshManager()
+void CMeshManager::Update_MeshManager()
 {
 	m_MatWorld = matrix4x4(
 		1, 0, 0, 0,
 		0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1);
+		0, 0, 1, 0,
+		0, 0, 0, 1);
 
 	m_MatView = Get_View_Matrix();
-	
-	float Fov =  PI/2.0f; // FOV 90 degree
+
+	float Fov = PI / 2.0f; // FOV 90 degree
 	float Aspect = (float)m_ViewWidth / m_ViewHeight;
 	float ZFar = 250.0f;
 	m_ZNear = 0.01f;
 
 	float h, w, Q;
-    w = (1.0f/tanf(Fov*0.5f))/Aspect;  
-    h = 1.0f/tanf(Fov*0.5f);   
-    Q = ZFar/(ZFar - m_ZNear);
-	
+	w = (1.0f / tanf(Fov * 0.5f)) / Aspect;
+	h = 1.0f / tanf(Fov * 0.5f);
+	Q = ZFar / (ZFar - m_ZNear);
+
 	m_MatProj = matrix4x4(
 		w, 0, 0, 0,
 		0, h, 0, 0,
 		0, 0, Q, 1,
-		0, 0, -Q*m_ZNear, 0);
+		0, 0, -Q * m_ZNear, 0);
 
 	matrix4x4 MatTemp;
 	Mat4x4_Mat4x4_Mul(MatTemp, m_MatWorld, m_MatView);
 	Mat4x4_Mat4x4_Mul(m_MatRes, MatTemp, m_MatProj);
 
-	Transform_BSP_Tree (m_Root);
+	Transform_BSP_Tree(m_Root);
+}
 
+//******************************************************
+//Функция отображает сцену на экране
+//******************************************************
+void CMeshManager::Draw_MeshManager()
+{
 	Clear_BackBuffer();
 
 	Draw_BSP_Tree (m_Root, m_VecPos);
