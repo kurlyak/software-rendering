@@ -42,6 +42,9 @@ struct vector4
 
 	//vector add
 	vector4 operator + (const vector4& Vec);
+
+	//vector add
+	vector4 &operator += (const vector4& Vec);
 };
 
 struct polygon;

@@ -458,31 +458,31 @@ matrix4x4 CMeshManager::Get_View_Matrix()
 	{
 		VecTemp = vector4(m_VecLook.x,0, m_VecLook.z);
 		VecTemp = VecTemp * RatioMove;
-		VecAccel = VecTemp * Time;
+		VecAccel += VecTemp * Time;
 	}
 
 	if(GetAsyncKeyState('S')& 0xFF00) 
 	{
 		VecTemp = vector4(m_VecLook.x,0, m_VecLook.z);
 		VecTemp = VecTemp * (-RatioMove);
-		VecAccel = VecTemp * Time;
+		VecAccel += VecTemp * Time;
 	}
 
 	if(GetAsyncKeyState('D')& 0xFF00) 
 	{
 		VecTemp = vector4(m_VecRight.x,0, m_VecRight.z);
 		VecTemp = VecTemp * RatioMove;
-		VecAccel = VecTemp * Time;
+		VecAccel += VecTemp * Time;
 	}
 
 	if(GetAsyncKeyState('A')& 0xFF00) 
 	{
 		VecTemp = vector4(m_VecRight.x,0, m_VecRight.z);
 		VecTemp = VecTemp * (-RatioMove);
-		VecAccel = VecTemp * Time;
+		VecAccel += VecTemp * Time;
 	}
 
-	m_VecPos = m_VecPos + VecAccel;
+	m_VecPos += VecAccel;
 
 	//рассчитываем матрицу вида
 	Vec4_Normalize(m_VecLook, m_VecLook);
@@ -1279,6 +1279,22 @@ vector4 vector4::operator + (const vector4& Vec)
 	VecTemp.tv = tv + Vec.tv;
 
 	return VecTemp;
+};
+
+//******************************************
+//Перегруженый оператор сложения векторов
+//******************************************
+vector4 &vector4::operator += (const vector4& Vec)
+{
+	x = x + Vec.x;
+	y = y + Vec.y;
+	z = z + Vec.z;
+	w = 1.0f;
+
+	tu = tu + Vec.tu;
+	tv = tv + Vec.tv;
+
+	return *this;
 };
 
 //******************************************
