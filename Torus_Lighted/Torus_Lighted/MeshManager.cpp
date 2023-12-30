@@ -105,8 +105,8 @@ void CMeshManager::Init_MeshManager(HWND hWnd)
 	float OuterRadius = 10.0f; //внешний радиус (общий)
 	float InnerRadius = 5.0f; //радиус трубки
 
-	float RingFactor = TWOPI / Rings;
-	float SideFactor = TWOPI / Sides;
+	float RingFactor = PI2 / Rings;
+	float SideFactor = PI2 / Sides;
 
 	UINT Index = 0;
 
@@ -196,7 +196,7 @@ void CMeshManager::Update_MeshManager()
         0, 0, 0, 1 };
 	
 	Angle += PI/175.0f;
-    if(Angle > PI*2.0f)
+    if(Angle > PI2)
 		Angle = 0.0f;
 
 	//при помощи этой матрицы можно

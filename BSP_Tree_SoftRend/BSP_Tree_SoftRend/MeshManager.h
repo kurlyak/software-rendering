@@ -32,19 +32,19 @@ struct vector4
 	float tu = 0.0f;
 	float tv = 0.0f;
 
-	vector4& operator = (const vector4& Vec);
+	vector4& operator = (const vector4& VecIn);
 	
 	//vector subtract
-	vector4 operator - (const vector4& Vec);
+	vector4 operator - (const vector4& VecIn);
 
 	//vector scale
-	vector4 operator * (const float& Vec);
+	vector4 operator * (const float& ValIn);
 
 	//vector add
-	vector4 operator + (const vector4& Vec);
+	vector4 operator + (const vector4& VecIn);
 
 	//vector add
-	vector4 &operator += (const vector4& Vec);
+	vector4 &operator += (const vector4& VecIn);
 };
 
 struct polygon;

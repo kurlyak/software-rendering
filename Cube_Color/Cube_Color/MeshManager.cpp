@@ -139,7 +139,7 @@ void CMeshManager::Update_MeshManager()
         0, 0, 0, 1};
 	
 	Angle += PI/100.0f;
-    if(Angle > PI*2)
+    if(Angle > PI2)
 		Angle = 0;
 	
 	//если нужно можно сместить куб

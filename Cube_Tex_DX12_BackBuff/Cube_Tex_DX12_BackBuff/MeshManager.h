@@ -24,6 +24,7 @@
 #pragma comment(lib, "dxgi.lib")
 
 #define PI 3.14159265358979f
+#define PI2 (PI * 2.0f)
 
 typedef float matrix4x4[4][4];
 
@@ -40,19 +41,11 @@ struct vector3
 	union
 	{
 		float Vec[3];
-		struct {
+		struct
+		{
 			float x, y, z;
 		};
 	};
-
-	vector3& operator = (const vector3& v_in)
-	{
-		x = v_in.x;
-		y = v_in.y;
-		z = v_in.z;
-
-		return *this;
-	}
 };
 
 class CMeshManager

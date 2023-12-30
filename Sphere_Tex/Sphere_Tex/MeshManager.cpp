@@ -52,7 +52,7 @@ void CMeshManager::Init_MeshManager(HWND hWnd)
 	int Slices = 20;
 	//float TWOPI  = 6.28318530717958f;
 	//float PI     = 3.14159265358979f;
-	float ThetaFac = TWOPI / (float)Slices;
+	float ThetaFac = PI2 / (float)Slices;
 	float PhiFac = PI / (float)Stacks;
 	float Radius = 8.0f;
 
@@ -123,7 +123,7 @@ void CMeshManager::Update_MeshManager()
 		0, 0, 0, 1 };
 
 	Angle += PI/100.0f;
-    if(Angle > PI*2)
+    if(Angle > PI2)
 		Angle = 0;
 
 	//при помощи этой матрицы можно

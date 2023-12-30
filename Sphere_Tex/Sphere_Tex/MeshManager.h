@@ -13,7 +13,7 @@
 #pragma comment(lib, "Vfw32.lib") //для DrawDibDraw
 
 #define PI 3.14159265358979f
-#define TWOPI 6.28318530717958f
+#define PI2 (PI * 2.0f)
 
 #define BITS_PER_PIXEL	32
 
@@ -32,19 +32,11 @@ struct vector3
 	union
 	{
 		float Vec[3];
-		struct {
+		struct
+		{
 			float x,y,z;
 		};
 	};
-
-	vector3 & operator = (const vector3 & Vec)
-	{
-		x = Vec.x;
-		y = Vec.y;
-		z = Vec.z;
-
-		return *this;
-	}
 };
 
 class CMeshManager

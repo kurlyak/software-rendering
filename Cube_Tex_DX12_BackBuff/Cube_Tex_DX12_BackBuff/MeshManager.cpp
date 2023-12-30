@@ -435,7 +435,7 @@ void CMeshManager::Update_MeshManager()
 		0, 0, 0, 1 };
 
 	Angle += ElapsedTime;
-	if (Angle > PI * 2.0f)
+	if (Angle > PI2)
 		Angle = 0.0f;
 
 	matrix4x4 MatWorld = {

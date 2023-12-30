@@ -13,6 +13,7 @@
 #pragma comment(lib, "Vfw32.lib")
 
 #define PI 3.14159265358979f
+#define PI2 (PI * 2.0f)
 
 #define BITS_PER_PIXEL	32
 

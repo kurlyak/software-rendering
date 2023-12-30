@@ -8,13 +8,15 @@
 #include <math.h>
 
 #define PI 3.14159265358979f
+#define PI2 (PI * 2.0f)
 
 #define NUM_VERTICES 8
 #define NUM_LINES 12
 
 HWND g_hWnd;
 
-struct vector3 {
+struct vector3
+{
 	float x, y, z;
 };
 
@@ -142,7 +144,7 @@ void Draw_Cube()
 		0.0,			0.0,	0.0,			1.0 };
 
 	Angle = Angle + PI / 100.0f;
-	if (Angle > PI * 2.0f)
+	if (Angle > PI2)
 		Angle = 0.0f;
 
 	//MATRIX VIEW CALCULATION

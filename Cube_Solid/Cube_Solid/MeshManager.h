@@ -13,6 +13,7 @@
 #pragma comment(lib, "Vfw32.lib")
 
 #define PI 3.14159265358979f
+#define PI2 (PI * 2.0f)
 
 #define BITS_PER_PIXEL	32
 
@@ -47,26 +48,6 @@ struct vector3
 	float x = 0.0f;
 	float y = 0.0f;
 	float z = 0.0f;
-	
-	vector3 operator - (const vector3 & Vec)
-	{
-		vector3 Temp;
-		
-		Temp.x = x - Vec.x;
-		Temp.y = y - Vec.y;
-		Temp.z = z - Vec.z;
-		
-		return Temp;
-	}
-		
-	vector3 &operator = (const vector3 & Vec)
-	{
-		x = Vec.x;
-		y = Vec.y;
-		z = Vec.z;
-
-		return *this;
-	}
 };
 
 class CMeshManager

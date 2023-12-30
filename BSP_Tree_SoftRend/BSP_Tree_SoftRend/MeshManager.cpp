@@ -1260,51 +1260,52 @@ void CMeshManager::Split_Polygon (polygon *Poly, plane *Part, polygon *&Front, p
 //*******************************************
 //Перегруженый оператор вычитания векторов
 //*******************************************
-vector4 vector4::operator - (const vector4 & Vec)
+vector4 vector4::operator - (const vector4 & VecIn)
 {
-	vector4 VecTemp;
+	vector4 VecOut;
 
-	VecTemp.x = x - Vec.x;
-	VecTemp.y = y - Vec.y;
-	VecTemp.z = z - Vec.z;
-	VecTemp.w = 1.0f;
+	VecOut.x = x - VecIn.x;
+	VecOut.y = y - VecIn.y;
+	VecOut.z = z - VecIn.z;
+	VecOut.w = 1.0f;
 
-	VecTemp.tu = tu - Vec.tu;
-	VecTemp.tv = tv - Vec.tv;
+	VecOut.tu = tu - VecIn.tu;
+	VecOut.tv = tv - VecIn.tv;
 
-	return VecTemp;
+	return VecOut;
 };
 
 //******************************************
 //Перегруженый оператор сложения векторов
 //******************************************
-vector4 vector4::operator + (const vector4& Vec)
+vector4 vector4::operator + (const vector4& VecIn)
 {
-	vector4 VecTemp;
+	vector4 VecOut;
 
-	VecTemp.x = x + Vec.x;
-	VecTemp.y = y + Vec.y;
-	VecTemp.z = z + Vec.z;
-	VecTemp.w = 1.0f;
+	VecOut.x = x + VecIn.x;
+	VecOut.y = y + VecIn.y;
+	VecOut.z = z + VecIn.z;
+	VecOut.w = 1.0f;
 
-	VecTemp.tu = tu + Vec.tu;
-	VecTemp.tv = tv + Vec.tv;
+	VecOut.tu = tu + VecIn.tu;
+	VecOut.tv = tv + VecIn.tv;
 
-	return VecTemp;
+	return VecOut;
 };
 
 //******************************************
 //Перегруженый оператор сложения векторов
 //******************************************
-vector4 &vector4::operator += (const vector4& Vec)
+vector4 &vector4::operator += (const vector4& VecIn)
 {
-	x = x + Vec.x;
-	y = y + Vec.y;
-	z = z + Vec.z;
+
+	x = x + VecIn.x;
+	y = y + VecIn.y;
+	z = z + VecIn.z;
 	w = 1.0f;
 
-	tu = tu + Vec.tu;
-	tv = tv + Vec.tv;
+	tu = tu + VecIn.tu;
+	tv = tv + VecIn.tv;
 
 	return *this;
 };
@@ -1313,33 +1314,33 @@ vector4 &vector4::operator += (const vector4& Vec)
 //Перегруженый оператор умножения вектора
 //на скаляр
 //******************************************
-vector4 vector4::operator * (const float & Vec)
+vector4 vector4::operator * (const float & ValIn)
 {
-	vector4 VecTemp;
+	vector4 VecOut;
 
-	VecTemp.x = x * Vec;
-	VecTemp.y = y * Vec;
-	VecTemp.z = z * Vec;
-	VecTemp.w = 1.0f;
+	VecOut.x = x * ValIn;
+	VecOut.y = y * ValIn;
+	VecOut.z = z * ValIn;
+	VecOut.w = 1.0f;
 
-	VecTemp.tu = tu * Vec;
-	VecTemp.tv = tv * Vec;
+	VecOut.tu = tu * ValIn;
+	VecOut.tv = tv * ValIn;
 
-	return VecTemp;
+	return VecOut;
 };
 
 //*************************************************
 //Перегруженый оператор присваивания для вектора
 //*************************************************
-vector4 & vector4::operator = (const vector4 & Vec)
+vector4 & vector4::operator = (const vector4 & VecIn)
 {
-	x = Vec.x;
-	y = Vec.y;
-	z = Vec.z;
-	w = Vec.w;
+	x = VecIn.x;
+	y = VecIn.y;
+	z = VecIn.z;
+	w = VecIn.w;
 
-	tu = Vec.tu;
-	tv = Vec.tv;
+	tu = VecIn.tu;
+	tv = VecIn.tv;
 
 	return *this;
 }

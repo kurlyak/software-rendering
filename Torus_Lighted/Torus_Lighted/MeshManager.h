@@ -13,7 +13,7 @@
 #pragma comment(lib, "Vfw32.lib") //для DrawDibDraw
 
 #define PI 3.14159265358979f
-#define TWOPI 6.28318530717958f
+#define PI2 (PI * 2.0f)
 
 #define SWAP(a,b,Temp) {Temp=a; a=b; b=Temp;}
 
@@ -55,18 +55,6 @@ struct vector3
 		
 		return VecOut;
 	}
-		
-	vector3 & operator = (const vector3 & VecIn)
-	{
-		xv = VecIn.xv;
-		yv = VecIn.yv;
-		zv = VecIn.zv;
-
-		xs = VecIn.xs;
-		ys = VecIn.ys;
-
-		return *this;
-	}
 };
 
 struct color_rgb
@@ -100,15 +88,6 @@ struct color_rgb
 		ColorOut.b = (int)(b * Val);
 
 		return ColorOut;
-	}
-
-	color_rgb &operator = (const vector3 & ColorIn)
-	{
-		r = (int) ColorIn.xv;
-		g = (int) ColorIn.yv;
-		b = (int) ColorIn.zv;
-
-		return *this;
 	}
 };
 
