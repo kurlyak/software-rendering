@@ -19,13 +19,16 @@
 
 #define BITS_PER_PIXEL	32
 
-typedef float matrix4x4[4][4];
+struct matrix4x4
+{
+	float Mat[4][4];
+};
 
 struct vector3
 {
 	union
 	{
-		float Mat[3];
+		float Vec[3];
 		struct
 		{
 			float xv, yv, zv;
@@ -42,36 +45,25 @@ struct vector3
 		zv = iz;
 	};
 
-	vector3 operator - (const vector3 & Vec)
+	vector3 operator - (const vector3 & VecIn)
 	{
-		vector3 Temp;
+		vector3 VecOut;
 		
-		Temp.xv = xv - Vec.xv;
-		Temp.yv = yv - Vec.yv;
-		Temp.zv = zv - Vec.zv;
+		VecOut.xv = xv - VecIn.xv;
+		VecOut.yv = yv - VecIn.yv;
+		VecOut.zv = zv - VecIn.zv;
 		
-		return Temp;
+		return VecOut;
 	}
-
-	vector3 operator * (const float & Vec)
-	{
-		vector3 Temp;
 		
-		Temp.xv = xv * Vec;
-		Temp.yv = yv * Vec;
-		Temp.zv = zv * Vec;
-		
-		return Temp;
-	}
-	
-	vector3 & operator = (const vector3 & Vec)
+	vector3 & operator = (const vector3 & VecIn)
 	{
-		xv = Vec.xv;
-		yv = Vec.yv;
-		zv = Vec.zv;
+		xv = VecIn.xv;
+		yv = VecIn.yv;
+		zv = VecIn.zv;
 
-		xs = Vec.xs;
-		ys = Vec.ys;
+		xs = VecIn.xs;
+		ys = VecIn.ys;
 
 		return *this;
 	}
@@ -88,22 +80,33 @@ struct color_rgb
 	int g = 0;
 	int b = 0;
 
-	color_rgb operator + (const color_rgb & Vec)
+	color_rgb operator + (const color_rgb & ColorIn)
 	{
-		color_rgb Temp;
+		color_rgb ColorOut;
 		
-		Temp.r = r + Vec.r;
-		Temp.g = g + Vec.g;
-		Temp.b = b + Vec.b;
+		ColorOut.r = r + ColorIn.r;
+		ColorOut.g = g + ColorIn.g;
+		ColorOut.b = b + ColorIn.b;
 		
-		return Temp;
+		return ColorOut;
 	}
 
-	color_rgb &operator = (const vector3 & Vec)
+	color_rgb operator * (const float& Val)
 	{
-		r = (int) Vec.xv;
-		g = (int) Vec.yv;
-		b = (int) Vec.zv;
+		color_rgb ColorOut;
+
+		ColorOut.r = (int)(r * Val);
+		ColorOut.g = (int)(g * Val);
+		ColorOut.b = (int)(b * Val);
+
+		return ColorOut;
+	}
+
+	color_rgb &operator = (const vector3 & ColorIn)
+	{
+		r = (int) ColorIn.xv;
+		g = (int) ColorIn.yv;
+		b = (int) ColorIn.zv;
 
 		return *this;
 	}
@@ -127,11 +130,11 @@ private:
 	void Present_BackBuffer();
 	void Delete_BackBuffer();
 	
-	void Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4 Mat2);
-	void Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat);
-	float Vec3_Dot(vector3& Vec1, vector3& Vec2);
-	void Vec3_Normalize(vector3& VecOut, vector3& Vec);
-	float Vec3_Len(vector3& Vec);
+	matrix4x4 Mat4x4_Mat4x4_Mul(matrix4x4 &MatIn1, matrix4x4 &MatIn2);
+	vector3 Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 &MatIn);
+	float Vec3_Dot(vector3& VecIn1, vector3& Vec2In);
+	vector3 Vec3_Normalize(vector3& VecIn);
+	float Vec3_Len(vector3& VecIn);
 
 	void Draw_Color_Triangle(float x1,float y1, float z1,
 					   float x2,float y2, float z2,

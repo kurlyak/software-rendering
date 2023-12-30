@@ -87,11 +87,7 @@ private:
 	void Present_BackBuffer();
 	void Delete_BackBuffer();
 	
-	void Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4 Mat2);
-	void Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat);
-	float Vec3_Dot(vector3& Vec1, vector3& Vec2);
-	void Vec3_Cross(vector3& VecOut, vector3& Vec1, vector3& Vec2);
-	void Vec3_Normalize(vector3& VecOut, vector3& Vec);
+	vector3 Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 MatIn);
 
 	void Draw_Color_Triangle(float x1,float y1,
 					   float x2,float y2,

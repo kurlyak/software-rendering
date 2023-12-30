@@ -31,7 +31,7 @@ struct vector3
 
 	union
 	{
-		float Mat[3];
+		float Vec[3];
 		struct {
 			float x,y,z;
 		};
@@ -67,11 +67,11 @@ private:
 
 	void Read_BMP_File(const char* TexFileName);
 
-	void Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat);
+	vector3 Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 MatIn);
 
-	void Draw_Textured_Triangle(vector3 Vec1, tex_coord2 Tex1,
-		vector3 Vec2, tex_coord2 Tex2,
-		vector3 Vec3, tex_coord2 Tex3);
+	void Draw_Textured_Triangle(vector3 VecIn1, tex_coord2 TexIn1,
+		vector3 VecIn2, tex_coord2 TexIn2,
+		vector3 VecIn3, tex_coord2 TexIn3);
 	void Draw_Textured_Poly(int y1, int y2);
 
 	HWND m_hWnd = NULL;

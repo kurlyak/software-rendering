@@ -487,21 +487,21 @@ void CMeshManager::Update_MeshManager()
 
 	for (UINT i = 0; i < m_VertCount; i++)
 	{
-		vector3 Vec;
+		vector3 VecTemp;
 
-		Vec = Vec3_Mat4x4_Mul(m_VertBuff[i], MatRotateX);
-		Vec = Vec3_Mat4x4_Mul(Vec, MatRotateY);
-		Vec = Vec3_Mat4x4_Mul(Vec, MatRotateZ);
-		Vec = Vec3_Mat4x4_Mul(Vec, MatWorld);
-		Vec = Vec3_Mat4x4_Mul(Vec, MatView);
-		Vec = Vec3_Mat4x4_Mul(Vec, MatProj);
+		VecTemp = Vec3_Mat4x4_Mul(m_VertBuff[i], MatRotateX);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatRotateY);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatRotateZ);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatWorld);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatView);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatProj);
 
-		Vec.x = Vec.x / Vec.z;
-		Vec.y = Vec.y / Vec.z;
+		VecTemp.x = VecTemp.x / VecTemp.z;
+		VecTemp.y = VecTemp.y / VecTemp.z;
 
-		Vec = Vec3_Mat4x4_Mul(Vec, MatScreen);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatScreen);
 
-		m_VertBuffTransformed[i] = Vec;
+		m_VertBuffTransformed[i] = VecTemp;
 	}
 }
 
@@ -564,7 +564,7 @@ void CMeshManager::Read_BMP_File(const char* szTexFileName)
 	m_TextureHeight = Bih.biHeight;
 }
 
-vector3 CMeshManager::Vec3_Mat4x4_Mul(vector3 VecIn, matrix4x4 MatIn)
+vector3 CMeshManager::Vec3_Mat4x4_Mul(vector3 &VecIn, matrix4x4 MatIn)
 {
 	vector3 VecOut;
 
@@ -574,19 +574,19 @@ vector3 CMeshManager::Vec3_Mat4x4_Mul(vector3 VecIn, matrix4x4 MatIn)
 		int i;
 		for (i = 0; i < 3; i++)
 		{
-			Sum += VecIn.Vec[i] * MatIn.Mat[i][j];
+			Sum += VecIn.Vec[i] * MatIn[i][j];
 		}
 
-		Sum += MatIn.Mat[i][j];
+		Sum += MatIn[i][j];
 		VecOut.Vec[j] = Sum;
 	}
 
 	return VecOut;
 }
 
-void CMeshManager::Draw_Textured_Triangle(vector3 Vec1, tex_coord2 TexCoord1,
-	vector3 Vec2, tex_coord2 TexCoord2,
-	vector3 Vec3, tex_coord2 TexCoord3)
+void CMeshManager::Draw_Textured_Triangle(vector3 VecIn1, tex_coord2 TexIn1,
+	vector3 VecIn2, tex_coord2 TexIn2,
+	vector3 VecIn3, tex_coord2 TexIn3)
 {
 	int Side;
 	float x1, x2, x3;
@@ -594,23 +594,23 @@ void CMeshManager::Draw_Textured_Triangle(vector3 Vec1, tex_coord2 TexCoord1,
 	float iz1, uiz1, viz1, iz2, uiz2, viz2, iz3, uiz3, viz3;
 	float Tempf;
 
-	x1 = Vec1.x;
-	y1 = Vec1.y;
-	x2 = Vec2.x;
-	y2 = Vec2.y;
-	x3 = Vec3.x;
-	y3 = Vec3.y;
+	x1 = VecIn1.x;
+	y1 = VecIn1.y;
+	x2 = VecIn2.x;
+	y2 = VecIn2.y;
+	x3 = VecIn3.x;
+	y3 = VecIn3.y;
 
-	iz1 = 1.0f / Vec1.z;
-	iz2 = 1.0f / Vec2.z;
-	iz3 = 1.0f / Vec3.z;
+	iz1 = 1.0f / VecIn1.z;
+	iz2 = 1.0f / VecIn2.z;
+	iz3 = 1.0f / VecIn3.z;
 
-	uiz1 = TexCoord1.tu * iz1;
-	viz1 = TexCoord1.tv * iz1;
-	uiz2 = TexCoord2.tu * iz2;
-	viz2 = TexCoord2.tv * iz2;
-	uiz3 = TexCoord3.tu * iz3;
-	viz3 = TexCoord3.tv * iz3;
+	uiz1 = TexIn1.tu * iz1;
+	viz1 = TexIn1.tv * iz1;
+	uiz2 = TexIn2.tu * iz2;
+	viz2 = TexIn2.tv * iz2;
+	uiz3 = TexIn3.tu * iz3;
+	viz3 = TexIn3.tv * iz3;
 
 #define swapfloat(x, y) Tempf = x; x = y; y = Tempf;
 
@@ -743,12 +743,8 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 	float ui, vi, zi;
 	float du, dv, dz;
 
-	for (int yi = y1; yi < y2; yi++)
+	for (int y = y1; y < y2; y++)
 	{
-		ui = m_ul;
-		vi = m_vl;
-		zi = m_zl;
-
 		if ((m_xr - m_xl) > 0)
 		{
 			du = (m_ur - m_ul) / (m_xr - m_xl);
@@ -762,7 +758,15 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 			dz = 0;
 		}
 
-		for (int xi = (int)m_xl; xi < (int)m_xr; xi++)
+		int xln = (int)m_xl;
+
+		float dxt = 1 - (m_xl - xln);
+
+		zi = m_zl + dxt * dz;
+		ui = m_ul + dxt * du;
+		vi = m_vl + dxt * dv;
+
+		for (int x = (int)m_xl; x < (int)m_xr; x++)
 		{
 			float z = 1.0f / zi;
 			float u = ui * z;
@@ -775,7 +779,7 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 
 			t = t * 3;
 
-			int Index = yi * 4 * m_ClientWidth + xi * 4;
+			int Index = y * 4 * m_ClientWidth + x * 4;
 
 			m_BackBuffer[Index + 0] = (BYTE)m_Res[t + 2]; // red
 			m_BackBuffer[Index + 1] = (BYTE)m_Res[t + 1]; // green
@@ -808,7 +812,7 @@ void CMeshManager::Draw_MeshManager2()
 		{
 			int Index = y * 800 * 4 + x * 4;
 
-			m_BackBuffer[Index] = 0; //red
+			m_BackBuffer[Index + 0] = 0; //red
 			m_BackBuffer[Index + 1] = 32; //green
 			m_BackBuffer[Index + 2] = 77; //blue
 			m_BackBuffer[Index + 3] = 0; //Alpha

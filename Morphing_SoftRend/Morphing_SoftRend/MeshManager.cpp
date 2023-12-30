@@ -23,61 +23,26 @@ CMeshManager::~CMeshManager()
 	delete [] IndicesArray;
 }
 
-void CMeshManager::Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4 Mat2)
+vector3 CMeshManager::Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 MatIn)
 {
-	//row1 * col1
-	MatOut[M00] = Mat1[M00] * Mat2[M00] + Mat1[M01] * Mat2[M10] + Mat1[M02] * Mat2[M20] + Mat1[M03] * Mat2[M30];
-	//row1 * col2
-	MatOut[M01] = Mat1[M00] * Mat2[M01] + Mat1[M01] * Mat2[M11] + Mat1[M02] * Mat2[M21] + Mat1[M03] * Mat2[M31];
-	//row1 * col3
-	MatOut[M02] = Mat1[M00] * Mat2[M02] + Mat1[M01] * Mat2[M12] + Mat1[M02] * Mat2[M22] + Mat1[M03] * Mat2[M32];
-	//row1 * col4
-	MatOut[M03] = Mat1[M00] * Mat2[M03] + Mat1[M01] * Mat2[M13] + Mat1[M02] * Mat2[M23] + Mat1[M03] * Mat2[M33];
+	vector3 VecOut;
 
-	//row2 * col1
-	MatOut[M10] = Mat1[M10] * Mat2[M00] + Mat1[M11] * Mat2[M10] + Mat1[M12] * Mat2[M20] + Mat1[M13] * Mat2[M30];
-	//row2 * col2
-	MatOut[M11] = Mat1[M10] * Mat2[M01] + Mat1[M11] * Mat2[M11] + Mat1[M12] * Mat2[M21] + Mat1[M13] * Mat2[M31];
-	//row2 * col3
-	MatOut[M12] = Mat1[M10] * Mat2[M02] + Mat1[M11] * Mat2[M12] + Mat1[M12] * Mat2[M22] + Mat1[M13] * Mat2[M32];
-	//row2 * col4
-	MatOut[M13] = Mat1[M10] * Mat2[M03] + Mat1[M11] * Mat2[M13] + Mat1[M12] * Mat2[M23] + Mat1[M13] * Mat2[M33];
+	VecOut.x =	VecIn.x * MatIn.Mat[M00] +
+				VecIn.y * MatIn.Mat[M10] +
+				VecIn.z * MatIn.Mat[M20] +
+						MatIn.Mat[M30];
 
-	//row3 * col1
-	MatOut[M20] = Mat1[M20] * Mat2[M00] + Mat1[M21] * Mat2[M10] + Mat1[M22] * Mat2[M20] + Mat1[M23] * Mat2[M30];
-	//row3 * col2
-	MatOut[M21] = Mat1[M20] * Mat2[M01] + Mat1[M21] * Mat2[M11] + Mat1[M22] * Mat2[M21] + Mat1[M23] * Mat2[M31];
-	//row3 * col3
-	MatOut[M22] = Mat1[M20] * Mat2[M02] + Mat1[M21] * Mat2[M12] + Mat1[M22] * Mat2[M22] + Mat1[M23] * Mat2[M32];
-	//row3 * col4
-	MatOut[M23] = Mat1[M20] * Mat2[M03] + Mat1[M21] * Mat2[M13] + Mat1[M22] * Mat2[M23] + Mat1[M23] * Mat2[M33];
+	VecOut.y =	VecIn.x * MatIn.Mat[M01] +
+				VecIn.y * MatIn.Mat[M11] +
+				VecIn.z * MatIn.Mat[M21] +
+						MatIn.Mat[M31];
 
-	//row4 * col1
-	MatOut[M30] = Mat1[M30] * Mat2[M00] + Mat1[M31] * Mat2[M10] + Mat1[M32] * Mat2[M20] + Mat1[M33] * Mat2[M30];
-	//row4 * col2
-	MatOut[M31] = Mat1[M30] * Mat2[M01] + Mat1[M31] * Mat2[M11] + Mat1[M32] * Mat2[M21] + Mat1[M33] * Mat2[M31];
-	//row4 * col3
-	MatOut[M32] = Mat1[M30] * Mat2[M02] + Mat1[M31] * Mat2[M12] + Mat1[M32] * Mat2[M22] + Mat1[M33] * Mat2[M32];
-	//row4 * col4
-	MatOut[M33] = Mat1[M30] * Mat2[M03] + Mat1[M31] * Mat2[M13] + Mat1[M32] * Mat2[M23] + Mat1[M33] * Mat2[M33];
-}
+	VecOut.z =	VecIn.x * MatIn.Mat[M02] +
+				VecIn.y * MatIn.Mat[M12] +
+				VecIn.z * MatIn.Mat[M22] +
+						MatIn.Mat[M32];
 
-void CMeshManager::Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat)
-{
-	VecOut.x =	Vec.x * Mat[M00] +
-				Vec.y * Mat[M10] +
-				Vec.z * Mat[M20] +
-						Mat[M30];
-
-	VecOut.y =	Vec.x * Mat[M01] +
-				Vec.y * Mat[M11] +
-				Vec.z * Mat[M21] +
-						Mat[M31];
-
-	VecOut.z =	Vec.x * Mat[M02] +
-				Vec.y * Mat[M12] +
-				Vec.z * Mat[M22] +
-						Mat[M32];
+	return VecOut;
 }
 
 void CMeshManager::Build_Side(vector3 * VertBuff, unsigned int * Indices)
@@ -127,7 +92,7 @@ void CMeshManager::Build_Side(vector3 * VertBuff, unsigned int * Indices)
 	}
 }
 
-void CMeshManager::MatrixRotationX(matrix4x4 MatOut, float Angle)
+matrix4x4 CMeshManager::MatrixRotationX(float Angle)
 {
 	matrix4x4 MatRotateX = {
 		1, 0, 0, 0,
@@ -135,10 +100,10 @@ void CMeshManager::MatrixRotationX(matrix4x4 MatOut, float Angle)
         0, -sinf(Angle), cosf(Angle), 0,
         0, 0, 0, 1};
 
-	memcpy(MatOut, MatRotateX, sizeof(matrix4x4));
+	return MatRotateX;
 }
 
-void CMeshManager::MatrixRotationZ(matrix4x4 MatOut, float Angle)
+matrix4x4 CMeshManager::MatrixRotationZ(float Angle)
 {
 	matrix4x4 MatRotateZ = {
 		cosf(Angle), sinf(Angle), 0, 0,
@@ -146,7 +111,7 @@ void CMeshManager::MatrixRotationZ(matrix4x4 MatOut, float Angle)
         0, 0, 1, 0,
         0, 0, 0, 1};
 
-	memcpy(MatOut, MatRotateZ, sizeof(matrix4x4));
+	return MatRotateZ;
 }
 
 void CMeshManager::Init_MeshManager(HWND hWnd)
@@ -197,42 +162,42 @@ void CMeshManager::Init_MeshManager(HWND hWnd)
 	vector3 VecTemp;
 
 	//нижн€€ сторона
-	MatrixRotationX(MxRotate, PI);
+	MxRotate = MatrixRotationX(PI);
 	for (UINT i = 0; i < NumVert; i++)
 	{
-		Vec3_Mat4x4_Mul(VecTemp, VertBuffTop[i], MxRotate);
+		VecTemp = Vec3_Mat4x4_Mul(VertBuffTop[i], MxRotate);
 		VertBuffBottom[i] = vector3(VecTemp.x, VecTemp.y, VecTemp.z );
 	}
 
 	//передн€€ сторона
-	MatrixRotationX(MxRotate, -PI/2.0f);
+	MxRotate = MatrixRotationX(-PI/2.0f);
 	for (UINT i = 0; i < NumVert; i++)
 	{
-		Vec3_Mat4x4_Mul(VecTemp, VertBuffTop[i], MxRotate);
+		VecTemp = Vec3_Mat4x4_Mul(VertBuffTop[i], MxRotate);
 		VertBuffFront[i] = vector3(VecTemp.x, VecTemp.y, VecTemp.z );
 	}
 
 	//задн€€ сторона
-	MatrixRotationX(MxRotate, PI/2.0f);
+	MxRotate = MatrixRotationX(PI/2.0f);
 	for (UINT i = 0; i < NumVert; i++)
 	{
-		Vec3_Mat4x4_Mul(VecTemp, VertBuffTop[i], MxRotate);
+		VecTemp = Vec3_Mat4x4_Mul(VertBuffTop[i], MxRotate);
 		VertBuffBack[i] = vector3(VecTemp.x, VecTemp.y, VecTemp.z );
 	}
 
 	//лева€ сторона
-	MatrixRotationZ(MxRotate, PI/2.0f);
+	MxRotate = MatrixRotationZ(PI/2.0f);
 	for (UINT i = 0; i < NumVert; i++)
 	{
-		Vec3_Mat4x4_Mul(VecTemp, VertBuffTop[i], MxRotate);
+		VecTemp = Vec3_Mat4x4_Mul(VertBuffTop[i], MxRotate);
 		VertBuffLeft[i] = vector3(VecTemp.x, VecTemp.y, VecTemp.z );
 	}
 
 	//права€ сторона
-	MatrixRotationZ(MxRotate, -PI/2.0f);
+	MxRotate = MatrixRotationZ(-PI/2.0f);
 	for (UINT i = 0; i < NumVert; i++)
 	{
-		Vec3_Mat4x4_Mul(VecTemp, VertBuffTop[i], MxRotate);
+		VecTemp = Vec3_Mat4x4_Mul(VertBuffTop[i], MxRotate);
 		VertBuffRight[i] = vector3(VecTemp.x, VecTemp.y, VecTemp.z );
 	}
 
@@ -400,16 +365,17 @@ void CMeshManager::Init_MeshManager(HWND hWnd)
 
 }
 
-void CMeshManager::Update(vector3 * Vec1, vector3 * Vec2, float Scalar)
+void CMeshManager::Update(vector3 * VecIn1, vector3 * VecIn2, float Scalar)
 {
 	for( UINT i=0; i < m_VertCount; i++ )
     {
-		vector3 VecSrcP = Vec1[i];
-		vector3 VecDstP = Vec2[i];
+		vector3 VecSrcP = VecIn1[i];
+		vector3 VecDstP = VecIn2[i];
 
 		float InvScalar = 1.0f - Scalar;
 		VecSrcP= VecSrcP * InvScalar;
 		VecDstP= VecDstP * Scalar;
+
 		ResultVertsArray[i] = VecSrcP + VecDstP;
 	}
 }
@@ -542,40 +508,34 @@ void CMeshManager::Update_MeshManager()
 
 	for (UINT i = 0; i < m_VertCount; i++)
 	{
-		matrix4x4 MatTemp1, MatTemp2;
-		Mat4x4_Mat4x4_Mul(MatTemp1, MatRotateX, MatRotateY);
-		Mat4x4_Mat4x4_Mul(MatTemp2, MatTemp1, MatRotateZ);
-		Mat4x4_Mat4x4_Mul(MatTemp1, MatTemp2, MatWorld);
-		Mat4x4_Mat4x4_Mul(MatTemp2, MatTemp1, MatProj);
+		
+		vector3 VecTemp = Vec3_Mat4x4_Mul(ResultVertsArray[i], MatRotateY);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatRotateX);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatRotateZ);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatWorld);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatProj);
 
-		vector3 Vec1;
-		Vec3_Mat4x4_Mul(Vec1, ResultVertsArray[i], MatTemp2);
+		VecTemp.x = VecTemp.x / VecTemp.z;
+		VecTemp.y = VecTemp.y / VecTemp.z;
 
-		Vec1.x = Vec1.x / Vec1.z;
-		Vec1.y = Vec1.y / Vec1.z;
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatScreen);
 
-		vector3 Vec2;
-		Vec3_Mat4x4_Mul(Vec2, Vec1, MatScreen);
-
-		m_VertBuffTransformed[i] = Vec2;
+		m_VertBuffTransformed[i] = VecTemp;
 	}
 }
 
 void CMeshManager::Draw_Color_Poly(int y1, int y2, color_rgb Color)
 {
-	for ( int yi = y1; yi < y2; yi++ )
+	for ( int y = y1; y < y2; y++ )
 	{
-		int x1 = (int) m_xl;
-		int x2 = (int) m_xr;
-
-		for (int xi=x1; xi<x2; xi++)
+		for (int x= (int)m_xl; x< (int)m_xr; x++)
 		{
-			int indx =  yi * 4 * m_ViewWidth + xi * 4;
+			int Index =  y * 4 * m_ViewWidth + x * 4;
 			
-			m_Data[indx] = Color.b; // blue
-			m_Data[indx + 1] = Color.g; // green
-			m_Data[indx + 2] = Color.r; // red
-			m_Data[indx + 3] = 0; 
+			m_Data[Index + 0] = Color.b; // blue
+			m_Data[Index + 1] = Color.g; // green
+			m_Data[Index + 2] = Color.r; // red
+			m_Data[Index + 3] = 0; 
 		}
 
 		m_xl+=m_dxl;
@@ -690,7 +650,7 @@ void CMeshManager::Draw_MeshManager()
 
     for (UINT i = 0; i < m_TriangleCount; i++)
 	 {
-		vector3 Vec1 = m_VertBuffTransformed[IndicesArray[i * 3]];
+		vector3 Vec1 = m_VertBuffTransformed[IndicesArray[i * 3 + 0]];
 		vector3 Vec2 = m_VertBuffTransformed[IndicesArray[i * 3 + 1]];
 		vector3 Vec3 = m_VertBuffTransformed[IndicesArray[i * 3 + 2]];
 
@@ -719,14 +679,14 @@ void CMeshManager::Create_BackBuffer()
 	m_ViewWidth = Rc.right;
 	m_ViewHeight = Rc.bottom;
 	
-	DWORD m_dwSize = Rc.right * (BITS_PER_PIXEL >> 3) * Rc.bottom;
+	DWORD m_dwSize = m_ViewWidth * (BITS_PER_PIXEL >> 3) * m_ViewHeight;
 
 	m_Data = (LPBYTE)malloc(m_dwSize*sizeof(BYTE));
 
 	memset(&m_Bih, 0, sizeof(BITMAPINFOHEADER));
 	m_Bih.biSize = sizeof(BITMAPINFOHEADER);
-	m_Bih.biWidth = Rc.right;
-	m_Bih.biHeight = Rc.bottom;
+	m_Bih.biWidth = m_ViewWidth;
+	m_Bih.biHeight = m_ViewHeight;
 	m_Bih.biPlanes = 1;
 	m_Bih.biBitCount = BITS_PER_PIXEL;
 	m_Bih.biCompression = BI_RGB;
@@ -749,13 +709,12 @@ void CMeshManager::Clear_BackBuffer()
 	{
 		for ( UINT j = 0; j < m_ViewWidth; j++ )
 		{
-			int indx = i * 4 * m_ViewWidth + j * 4;
+			int Index = i * 4 * m_ViewWidth + j * 4;
 
-			m_Data[indx] = (BYTE) (255.0 * 0.3f); // blue
-			m_Data[indx + 1] = (BYTE) (255.0 * 0.125f); // green
-			m_Data[indx + 2] = 0; // red
-
-			m_Data[indx + 3] = 0; 
+			m_Data[Index + 0] = (BYTE) (255.0 * 0.3f); // blue
+			m_Data[Index + 1] = (BYTE) (255.0 * 0.125f); // green
+			m_Data[Index + 2] = 0; // red
+			m_Data[Index + 3] = 0; 
 		}
 	}
 }

@@ -66,13 +66,12 @@ public:
 
 private:
 
-	void Build_BackBuffer();
+	void Create_BackBuffer();
 	void Clear_BackBuffer();
 	void Present_BackBuffer();
 	void Delete_BackBuffer();
 	
-	void Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4 Mat2);
-	void Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat);
+	vector3 Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 MatIn);
 
 	void Draw_Color_Triangle(float x1,float y1,
 					   float x2,float y2,

@@ -137,13 +137,13 @@ public:
 	void Present_BackBuffer();
 	void Delete_BackBuffer();
 
-	void Vec4_Normalize(vector4& VecOut, vector4& Vec);
-	matrix4x4 Matrix_Rotation_Axis(vector4 Vec, float Angle);
-	vector4 Calc_Edge(vector4 Vec1, vector4 Vec2);
-	void Vec4_Mat4x4_Mul(vector4& VecOut, vector4& Vec, matrix4x4& Mat);
-	void Mat4x4_Mat4x4_Mul(matrix4x4& MatOut, matrix4x4& Mat1, matrix4x4& Mat2);
-	float Vec4_Dot(vector4& Vec1, vector4& Vec2);
-	void Vec4_Cross(vector4& VecOut, vector4& Vec1, vector4& Vec2);
+	vector4 Vec4_Normalize(vector4& VecIn);
+	matrix4x4 Matrix_Rotation_Axis(vector4 &VecIn, float Angle);
+	vector4 Calc_Edge(vector4 &VecIn1, vector4 &VecIn2);
+	vector4 Vec4_Mat4x4_Mul(vector4& VecIn, matrix4x4& MatIn);
+	matrix4x4 Mat4x4_Mat4x4_Mul(matrix4x4& MatIn1, matrix4x4& MatIn2);
+	float Vec4_Dot(vector4& VecIn1, vector4& VecIn2);
+	vector4 Vec4_Cross(vector4& VecIn1, vector4& VecIn2);
 
 	int Get_TextureID(char * TexName);
 
@@ -159,7 +159,7 @@ public:
 	bool Polygon_In_Frustum(UINT NumPoints, vector4* PointList);
 
 	void Draw_Polygon_List(list Polygons);
-	void Draw_Textured_Triangle(vector4 Vec0, vector4 Vec1, vector4 Vec2);
+	void Draw_Textured_Triangle(vector4 VecIn1, vector4 VecIn2, vector4 VecIn3);
 	void Draw_Textured_Poly(int y1, int y2);
 
 	void Timer_Start();

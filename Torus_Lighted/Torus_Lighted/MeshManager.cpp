@@ -19,8 +19,10 @@ CMeshManager::~CMeshManager()
 	delete[] m_NormalBuffTransformed;
 }
 
-void CMeshManager::Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4 Mat2)
+matrix4x4 CMeshManager::Mat4x4_Mat4x4_Mul(matrix4x4 &MatIn1, matrix4x4 &MatIn2)
 {
+	matrix4x4 MatOut;
+
 	for (int Row = 0; Row < 4; Row++)
 	{
 		for (int Col = 0; Col < 4; Col++)
@@ -29,47 +31,57 @@ void CMeshManager::Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4
 
 			for (int Index = 0; Index < 4; Index++)
 			{
-				Sum += (Mat1[Row][Index] * Mat2[Index][Col]);
+				Sum += (MatIn1.Mat[Row][Index] * MatIn2.Mat[Index][Col]);
 			}
 
-			MatOut[Row][Col] = Sum;
+			MatOut.Mat[Row][Col] = Sum;
 		}
 	}
+
+	return MatOut;
 }
 
-void CMeshManager::Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat)
+vector3 CMeshManager::Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 &MatIn)
 {
+	vector3 VecOut;
+	
 	for (int j = 0; j < 3; j++)
 	{
 		float Sum = 0.0f;
 		int i;
 		for (i = 0; i < 3; i++)
 		{
-			Sum += Vec.Mat[i] * Mat[i][j];
+			Sum += VecIn.Vec[i] * MatIn.Mat[i][j];
 		}
 
-		Sum += Mat[i][j];
-		VecOut.Mat[j] = Sum;
+		Sum += MatIn.Mat[i][j];
+		VecOut.Vec[j] = Sum;
 	}
+
+	return VecOut;
 }
 
-float CMeshManager::Vec3_Dot(vector3& Vec1, vector3& Vec2)
+float CMeshManager::Vec3_Dot(vector3& VecIn1, vector3& VecIn2)
 {
-	return Vec1.xv * Vec2.xv + Vec1.yv * Vec2.yv + Vec1.zv * Vec2.zv;
+	return VecIn1.xv * VecIn2.xv + VecIn1.yv * VecIn2.yv + VecIn1.zv * VecIn2.zv;
 }
 
-void CMeshManager::Vec3_Normalize(vector3& VecOut, vector3& Vec)
+vector3 CMeshManager::Vec3_Normalize(vector3& VecIn)
 {
-	float Len = sqrtf( (Vec.xv * Vec.xv) + (Vec.yv * Vec.yv) + (Vec.zv * Vec.zv));
+	vector3 VecOut;
 
-	VecOut.xv = Vec.xv / Len;
-	VecOut.yv = Vec.yv / Len;
-	VecOut.zv = Vec.zv / Len;
+	float Len = sqrtf( (VecIn.xv * VecIn.xv) + (VecIn.yv * VecIn.yv) + (VecIn.zv * VecIn.zv));
+
+	VecOut.xv = VecIn.xv / Len;
+	VecOut.yv = VecIn.yv / Len;
+	VecOut.zv = VecIn.zv / Len;
+
+	return VecOut;
 }
 
-float CMeshManager::Vec3_Len(vector3& Vec)
+float CMeshManager::Vec3_Len(vector3& VecIn)
 {
-	return sqrtf(Vec.xv * Vec.xv + Vec.yv * Vec.yv + Vec.zv * Vec.zv);
+	return sqrtf(VecIn.xv * VecIn.xv + VecIn.yv * VecIn.yv + VecIn.zv * VecIn.zv);
 }
 
 void CMeshManager::Init_MeshManager(HWND hWnd)
@@ -118,7 +130,7 @@ void CMeshManager::Init_MeshManager(HWND hWnd)
             m_NormalBuff[Index].yv = cv * su * r;
             m_NormalBuff[Index].zv = sv * r;
 
-			Vec3_Normalize(m_NormalBuff[Index], m_NormalBuff[Index]);
+			m_NormalBuff[Index] = Vec3_Normalize(m_NormalBuff[Index]);
 
 			//tex[Index].tu = u / PI2;
 			//tex[Index].tv = Vec / PI2;
@@ -228,41 +240,39 @@ void CMeshManager::Update_MeshManager()
 
 	for (UINT i = 0; i < m_VertCount; i++)
 	{
-		matrix4x4 MatTemp1, MatTemp2;
-		Mat4x4_Mat4x4_Mul(MatTemp1, MatRotateX, MatRotateY);
-		Mat4x4_Mat4x4_Mul(MatTemp2, MatTemp1, MatRotateZ);
-		Mat4x4_Mat4x4_Mul(MatTemp1, MatTemp2, MatWorld);
-		Mat4x4_Mat4x4_Mul(MatTemp2, MatTemp1, MatView);
+		
+		matrix4x4 MatTemp = Mat4x4_Mat4x4_Mul(MatRotateX, MatRotateY);
+		MatTemp = Mat4x4_Mat4x4_Mul(MatTemp, MatRotateZ);
+		MatTemp = Mat4x4_Mat4x4_Mul(MatTemp, MatWorld);
+		MatTemp = Mat4x4_Mat4x4_Mul(MatTemp, MatView);
 
 		matrix4x4 MatNormal = {
-			MatTemp2[0][0],	MatTemp2[0][1], MatTemp2[0][2], 0.0f,
-			MatTemp2[1][0],	MatTemp2[1][1], MatTemp2[1][2], 0.0f,
-			MatTemp2[2][0],	MatTemp2[2][1], MatTemp2[2][2], 0.0f,
+			MatTemp.Mat[0][0],	MatTemp.Mat[0][1], MatTemp.Mat[0][2], 0.0f,
+			MatTemp.Mat[1][0],	MatTemp.Mat[1][1], MatTemp.Mat[1][2], 0.0f,
+			MatTemp.Mat[2][0],	MatTemp.Mat[2][1], MatTemp.Mat[2][2], 0.0f,
 			0.0f,			0.0f,			0.0f,			1.0f };
 
 		//трансформируем нормали
-		vector3 Norm;
-		Vec3_Mat4x4_Mul(Norm, m_NormalBuff[i], MatNormal);
-		Vec3_Normalize(Norm, Norm);
+		vector3 Norm = Vec3_Mat4x4_Mul(m_NormalBuff[i], MatNormal);
+		Norm = Vec3_Normalize(Norm);
 		m_NormalBuffTransformed[i] = Norm;
 
 		//трансформируем вершины
-		vector3 Vec;
-		Vec3_Mat4x4_Mul(Vec, m_VertBuff[i], MatTemp2);
-
-		vector3 VecS;
-		Vec3_Mat4x4_Mul(VecS, Vec, MatProj);
-
-		VecS.xs = VecS.xv / VecS.zv;
-		VecS.ys = VecS.yv / VecS.zv;
 		
-		VecS.xs = VecS.xs * m_ViewWidth / 2.0f + m_ViewWidth / 2.0f;
-		VecS.ys = -VecS.ys * m_ViewHeight / 2.0f + m_ViewHeight / 2.0f;
+		vector3 VecTemp = Vec3_Mat4x4_Mul(m_VertBuff[i], MatTemp);
 
-		Vec.xs = VecS.xs;
-		Vec.ys = VecS.ys;
+		vector3 VecScreenTemp = Vec3_Mat4x4_Mul(VecTemp, MatProj);
+		
+		VecScreenTemp.xs = VecScreenTemp.xv / VecScreenTemp.zv;
+		VecScreenTemp.ys = VecScreenTemp.yv / VecScreenTemp.zv;
+		
+		VecScreenTemp.xs = VecScreenTemp.xs * m_ViewWidth / 2.0f + m_ViewWidth / 2.0f;
+		VecScreenTemp.ys = -VecScreenTemp.ys * m_ViewHeight / 2.0f + m_ViewHeight / 2.0f;
 
-		m_VertBuffTransformed[i] = Vec;
+		VecTemp.xs = VecScreenTemp.xs;
+		VecTemp.ys = VecScreenTemp.ys;
+
+		m_VertBuffTransformed[i] = VecTemp;
 	}
 }
 
@@ -272,7 +282,7 @@ void CMeshManager::Draw_Color_Poly(int y1, int y2)
 	float dr, dg, db;
 	float zi, dz;
 
-	for ( int yi = y1; yi < y2; yi++ )
+	for ( int y = y1; y < y2; y++ )
 	{
 
 		ri = m_redl;
@@ -295,9 +305,9 @@ void CMeshManager::Draw_Color_Poly(int y1, int y2)
 			dz = 0;
 		}
 
-		for (int xi=(int)m_xl; xi < m_xr; xi++)
+		for (int x=(int)m_xl; x < (int)m_xr; x++)
 		{
-			float fZVal = m_ZBuff[yi][xi];
+			float fZVal = m_ZBuff[y][x];
 
 			//если глубина fZVal в Z буфере меньше
 			//чем глубина пикселя Z
@@ -313,11 +323,11 @@ void CMeshManager::Draw_Color_Poly(int y1, int y2)
 				continue;
 			}
 
-			m_ZBuff[yi][xi] = zi;
+			m_ZBuff[y][x] = zi;
 			
-			UINT Index =  yi * 4 * m_ViewWidth + xi * 4;
+			UINT Index =  y * 4 * m_ViewWidth + x * 4;
 			
-			m_Data[Index] = (BYTE) bi; // blue
+			m_Data[Index + 0] = (BYTE) bi; // blue
 			m_Data[Index + 1] = (BYTE) gi; // green
 			m_Data[Index + 2] = (BYTE) ri; // red
 			m_Data[Index + 3] = 0; 
@@ -513,11 +523,11 @@ void CMeshManager::Draw_MeshManager ()
 
     for (UINT i = 0; i < m_TriangleCount; i++)
     {
-		vector3 Vec1 = m_VertBuffTransformed[m_IndexBuff[i * 3]];
+		vector3 Vec1 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 0]];
 		vector3 Vec2 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 1]];
 		vector3 Vec3 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 2]];
 
-		vector3 Norm1 = m_NormalBuffTransformed[m_IndexBuff[i * 3]];
+		vector3 Norm1 = m_NormalBuffTransformed[m_IndexBuff[i * 3 + 0]];
 		vector3 Norm2 = m_NormalBuffTransformed[m_IndexBuff[i * 3 + 1]];
 		vector3 Norm3 = m_NormalBuffTransformed[m_IndexBuff[i * 3 + 2]];
 		
@@ -526,7 +536,7 @@ void CMeshManager::Draw_MeshManager ()
 		color_rgb rgb3;
 
 		vector3 VecPosLight = vector3(-25.0f, 0.0f, -25.0f);
-		vector3 DiffLightColor= vector3(255.0f, 255.0f, 128.0f);
+		color_rgb DiffLightColor= color_rgb(255, 255, 128);
 
 		vector3 VecLightDir1 = VecPosLight - Vec1;
 		vector3 VecLightDir2 = VecPosLight - Vec2;
@@ -536,9 +546,9 @@ void CMeshManager::Draw_MeshManager ()
 		float Dist2 = Vec3_Len(VecLightDir2);
 		float Dist3 = Vec3_Len(VecLightDir3);
 
-		Vec3_Normalize(VecLightDir1, VecLightDir1);
-		Vec3_Normalize(VecLightDir2, VecLightDir2);
-		Vec3_Normalize(VecLightDir3, VecLightDir3);
+		VecLightDir1 = Vec3_Normalize(VecLightDir1);
+		VecLightDir2 = Vec3_Normalize(VecLightDir2);
+		VecLightDir3 = Vec3_Normalize(VecLightDir3);
 	
 		float DotProd1 = Vec3_Dot(Norm1,VecLightDir1);
 		float DotProd2 = Vec3_Dot(Norm2,VecLightDir2);

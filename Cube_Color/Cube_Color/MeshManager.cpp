@@ -18,68 +18,33 @@ CMeshManager::~CMeshManager()
 	delete [] m_ColorArray;
 }
 
-void CMeshManager::Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4 Mat2)
+vector3 CMeshManager::Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 MatIn)
 {
-	//row1 * col1
-	MatOut[M00] = Mat1[M00] * Mat2[M00] + Mat1[M01] * Mat2[M10] + Mat1[M02] * Mat2[M20] + Mat1[M03] * Mat2[M30];
-	//row1 * col2
-	MatOut[M01] = Mat1[M00] * Mat2[M01] + Mat1[M01] * Mat2[M11] + Mat1[M02] * Mat2[M21] + Mat1[M03] * Mat2[M31];
-	//row1 * col3
-	MatOut[M02] = Mat1[M00] * Mat2[M02] + Mat1[M01] * Mat2[M12] + Mat1[M02] * Mat2[M22] + Mat1[M03] * Mat2[M32];
-	//row1 * col4
-	MatOut[M03] = Mat1[M00] * Mat2[M03] + Mat1[M01] * Mat2[M13] + Mat1[M02] * Mat2[M23] + Mat1[M03] * Mat2[M33];
+	vector3 VecOut;
 
-	//row2 * col1
-	MatOut[M10] = Mat1[M10] * Mat2[M00] + Mat1[M11] * Mat2[M10] + Mat1[M12] * Mat2[M20] + Mat1[M13] * Mat2[M30];
-	//row2 * col2
-	MatOut[M11] = Mat1[M10] * Mat2[M01] + Mat1[M11] * Mat2[M11] + Mat1[M12] * Mat2[M21] + Mat1[M13] * Mat2[M31];
-	//row2 * col3
-	MatOut[M12] = Mat1[M10] * Mat2[M02] + Mat1[M11] * Mat2[M12] + Mat1[M12] * Mat2[M22] + Mat1[M13] * Mat2[M32];
-	//row2 * col4
-	MatOut[M13] = Mat1[M10] * Mat2[M03] + Mat1[M11] * Mat2[M13] + Mat1[M12] * Mat2[M23] + Mat1[M13] * Mat2[M33];
+	VecOut.x =	VecIn.x * MatIn[M00] +
+				VecIn.y * MatIn[M10] +
+				VecIn.z * MatIn[M20] +
+						MatIn[M30];
 
-	//row3 * col1
-	MatOut[M20] = Mat1[M20] * Mat2[M00] + Mat1[M21] * Mat2[M10] + Mat1[M22] * Mat2[M20] + Mat1[M23] * Mat2[M30];
-	//row3 * col2
-	MatOut[M21] = Mat1[M20] * Mat2[M01] + Mat1[M21] * Mat2[M11] + Mat1[M22] * Mat2[M21] + Mat1[M23] * Mat2[M31];
-	//row3 * col3
-	MatOut[M22] = Mat1[M20] * Mat2[M02] + Mat1[M21] * Mat2[M12] + Mat1[M22] * Mat2[M22] + Mat1[M23] * Mat2[M32];
-	//row3 * col4
-	MatOut[M23] = Mat1[M20] * Mat2[M03] + Mat1[M21] * Mat2[M13] + Mat1[M22] * Mat2[M23] + Mat1[M23] * Mat2[M33];
+	VecOut.y =	VecIn.x * MatIn[M01] +
+				VecIn.y * MatIn[M11] +
+				VecIn.z * MatIn[M21] +
+						MatIn[M31];
 
-	//row4 * col1
-	MatOut[M30] = Mat1[M30] * Mat2[M00] + Mat1[M31] * Mat2[M10] + Mat1[M32] * Mat2[M20] + Mat1[M33] * Mat2[M30];
-	//row4 * col2
-	MatOut[M31] = Mat1[M30] * Mat2[M01] + Mat1[M31] * Mat2[M11] + Mat1[M32] * Mat2[M21] + Mat1[M33] * Mat2[M31];
-	//row4 * col3
-	MatOut[M32] = Mat1[M30] * Mat2[M02] + Mat1[M31] * Mat2[M12] + Mat1[M32] * Mat2[M22] + Mat1[M33] * Mat2[M32];
-	//row4 * col4
-	MatOut[M33] = Mat1[M30] * Mat2[M03] + Mat1[M31] * Mat2[M13] + Mat1[M32] * Mat2[M23] + Mat1[M33] * Mat2[M33];
-}
+	VecOut.z =	VecIn.x * MatIn[M02] +
+				VecIn.y * MatIn[M12] +
+				VecIn.z * MatIn[M22] +
+						MatIn[M32];
 
-void CMeshManager::Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat)
-{
-	VecOut.x =	Vec.x * Mat[M00] +
-				Vec.y * Mat[M10] +
-				Vec.z * Mat[M20] +
-						Mat[M30];
-
-	VecOut.y =	Vec.x * Mat[M01] +
-				Vec.y * Mat[M11] +
-				Vec.z * Mat[M21] +
-						Mat[M31];
-
-	VecOut.z =	Vec.x * Mat[M02] +
-				Vec.y * Mat[M12] +
-				Vec.z * Mat[M22] +
-						Mat[M32];
+	return VecOut;
 }
 
 void CMeshManager::Init_MeshManager(HWND hwnd)
 {
 	m_hWnd = hwnd;
 
-	Build_BackBuffer();
+	Create_BackBuffer();
 
 	m_VertCount = 8;
 	m_TriangleCount = 12;
@@ -222,22 +187,18 @@ void CMeshManager::Update_MeshManager()
 
 	for (UINT i = 0; i < m_VertCount; i++)
 	{
-		matrix4x4 MatTemp1, MatTemp2;
-		Mat4x4_Mat4x4_Mul(MatTemp1, MatRotateX, MatRotateY);
-		Mat4x4_Mat4x4_Mul(MatTemp2, MatTemp1, MatRotateZ);
-		Mat4x4_Mat4x4_Mul(MatTemp1, MatTemp2, MatWorld);
-		Mat4x4_Mat4x4_Mul(MatTemp2, MatTemp1, MatProj);
+		vector3 VecTemp = Vec3_Mat4x4_Mul(m_VertBuff[i], MatRotateY);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatRotateX);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatRotateZ);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatWorld);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatProj);
 
-		vector3 Vec1;
-		Vec3_Mat4x4_Mul(Vec1, m_VertBuff[i], MatTemp2);
+		VecTemp.x = VecTemp.x / VecTemp.z;
+		VecTemp.y = VecTemp.y / VecTemp.z;
 
-		Vec1.x = Vec1.x / Vec1.z;
-		Vec1.y = Vec1.y / Vec1.z;
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatScreen);
 
-		vector3 Vec2;
-		Vec3_Mat4x4_Mul(Vec2, Vec1, MatScreen);
-
-		m_VertBuffTransformed[i] = Vec2;
+		m_VertBuffTransformed[i] = VecTemp;
 	}
 }
 
@@ -246,7 +207,7 @@ void CMeshManager::Draw_Color_Poly(int y1, int y2)
 	float ri, gi, bi;
 	float dr, dg, db;
 
-	for ( int yi = y1; yi < y2; yi++ )
+	for ( int y = y1; y < y2; y++ )
 	{
 		ri = m_redl;
 		gi = m_greenl;
@@ -265,10 +226,11 @@ void CMeshManager::Draw_Color_Poly(int y1, int y2)
 			db = m_bluer - m_bluel;
 		}
 
-		for (int xi=(int)m_xl; xi<m_xr; xi++)
+		for (int x=(int)m_xl; x<(int)m_xr; x++)
 		{
-			int Index =  yi * 4 * m_ViewWidth + xi * 4;
-			m_Data[Index] = (BYTE) bi; // blue
+			int Index =  y * 4 * m_ViewWidth + x * 4;
+
+			m_Data[Index + 0] = (BYTE) bi; // blue
 			m_Data[Index + 1] = (BYTE) gi; // green
 			m_Data[Index + 2] = (BYTE) ri; // red
 			m_Data[Index + 3] = 0; 
@@ -435,7 +397,7 @@ void CMeshManager::Draw_MeshManager()
 
     for (UINT i = 0; i < m_TriangleCount; i++)
 	 {
-		vector3 Vec1 = m_VertBuffTransformed[m_IndexBuff[i * 3]];
+		vector3 Vec1 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 0]];
 		vector3 Vec2 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 1]];
 		vector3 Vec3 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 2]];
 		
@@ -458,7 +420,7 @@ void CMeshManager::Draw_MeshManager()
 	
 }
 
-void CMeshManager::Build_BackBuffer()
+void CMeshManager::Create_BackBuffer()
 {
 	RECT Rc;
 	GetClientRect(m_hWnd, &Rc);
@@ -466,14 +428,14 @@ void CMeshManager::Build_BackBuffer()
 	m_ViewWidth = Rc.right;
 	m_ViewHeight = Rc.bottom;
 	
-	DWORD m_dwSize = Rc.right * (BITS_PER_PIXEL >> 3) * Rc.bottom;
+	DWORD m_dwSize = m_ViewWidth * (BITS_PER_PIXEL >> 3) * m_ViewHeight;
 
 	m_Data = (LPBYTE)malloc(m_dwSize*sizeof(BYTE));
 
 	memset(&m_Bih, 0, sizeof(BITMAPINFOHEADER));
 	m_Bih.biSize = sizeof(BITMAPINFOHEADER);
-	m_Bih.biWidth = Rc.right;
-	m_Bih.biHeight = Rc.bottom;
+	m_Bih.biWidth = m_ViewWidth;
+	m_Bih.biHeight = m_ViewHeight;
 	m_Bih.biPlanes = 1;
 	m_Bih.biBitCount = BITS_PER_PIXEL;
 	m_Bih.biCompression = BI_RGB;
@@ -490,10 +452,9 @@ void CMeshManager::Clear_BackBuffer()
 		{
 			int Index = i * 4 * m_ViewWidth + j * 4;
 
-			m_Data[Index] = (BYTE) (255.0 * 0.3f); // blue
+			m_Data[Index + 0] = (BYTE) (255.0 * 0.3f); // blue
 			m_Data[Index + 1] = (BYTE) (255.0 * 0.125f); // green
 			m_Data[Index + 2] = 0; // red
-
 			m_Data[Index + 3] = 0; 
 		}
 	}

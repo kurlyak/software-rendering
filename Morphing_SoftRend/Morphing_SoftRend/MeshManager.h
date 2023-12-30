@@ -41,7 +41,10 @@ enum {
 	M30, M31, M32, M33
 };
 
-typedef float matrix4x4[16];
+struct matrix4x4
+{
+	float Mat[16];
+};
 
 struct vector3
 {
@@ -57,46 +60,46 @@ struct vector3
 		z = iz;
 	};
 
-	vector3 operator - (const vector3 & Vec)
+	vector3 operator - (const vector3 & VecIn)
 	{
-		vector3 Temp;
+		vector3 VecOut;
 		
-		Temp.x = x - Vec.x;
-		Temp.y = y - Vec.y;
-		Temp.z = z - Vec.z;
+		VecOut.x = x - VecIn.x;
+		VecOut.y = y - VecIn.y;
+		VecOut.z = z - VecIn.z;
 		
-		return Temp;
+		return VecOut;
 	}
 	
-	vector3 & operator = (const vector3 & Vec)
+	vector3 & operator = (const vector3 & VecIn)
 	{
-		x = Vec.x;
-		y = Vec.y;
-		z = Vec.z;
+		x = VecIn.x;
+		y = VecIn.y;
+		z = VecIn.z;
 
 		return *this;
 	}
 	
-	vector3 operator * (const float & Vec)
+	vector3 operator * (const float & ValIn)
 	{
-		vector3 Temp;
+		vector3 VecOut;
 
-		Temp.x = x * Vec;
-		Temp.y = y * Vec;
-		Temp.z = z * Vec;
+		VecOut.x = x * ValIn;
+		VecOut.y = y * ValIn;
+		VecOut.z = z * ValIn;
 
-		return Temp;
+		return VecOut;
 	};
 	
-	vector3 operator + (const vector3 & Vec)
+	vector3 operator + (const vector3 & VecIn)
 	{
-		vector3 Temp;
+		vector3 VecOut;
 
-		Temp.x = x + Vec.x;
-		Temp.y = y + Vec.y;
-		Temp.z = z + Vec.z;
+		VecOut.x = x + VecIn.x;
+		VecOut.y = y + VecIn.y;
+		VecOut.z = z + VecIn.z;
 
-		return Temp;
+		return VecOut;
 	};
 	
 
@@ -120,13 +123,12 @@ private:
 	void Present_BackBuffer();
 	void Delete_BackBuffer();
 
-	void Update(vector3 * Vec1, vector3 * Vec2, float Scalar);
+	void Update(vector3 * VecIn1, vector3 * VecIn2, float Scalar);
 	
-	void Mat4x4_Mat4x4_Mul(matrix4x4 MatOut, matrix4x4 Mat1, matrix4x4 Mat2);
-	void Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat);
+	vector3 Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 MatIn);
 
-	void MatrixRotationX(matrix4x4 MatOut, float Angle);
-	void MatrixRotationZ(matrix4x4 MatOut, float Angle);
+	matrix4x4 MatrixRotationX(float Angle);
+	matrix4x4 MatrixRotationZ(float Angle);
 
 	void Build_Side(vector3 * VertBuff, UINT * Indices);
 

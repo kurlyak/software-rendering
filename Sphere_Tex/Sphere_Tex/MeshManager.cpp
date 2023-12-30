@@ -20,20 +20,24 @@ CMeshManager::~CMeshManager()
 	delete [] m_Res;
 }
 
-void CMeshManager::Vec3_Mat4x4_Mul(vector3& VecOut, vector3& Vec, matrix4x4 Mat)
+vector3 CMeshManager::Vec3_Mat4x4_Mul(vector3& VecIn, matrix4x4 MatIn)
 {
+	vector3 VecOut;
+
 	for ( int j = 0; j < 3; j++)
 	{
 		float Sum = 0.0f;
 		int i;
 		for ( i = 0; i < 3; i++)
 		{
-			Sum += Vec.Mat[i] * Mat[i][j];
+			Sum += VecIn.Vec[i] * MatIn[i][j];
 		}
 		
-		Sum += Mat[i][j];
-		VecOut.Mat[j] = Sum;
+		Sum += MatIn[i][j];
+		VecOut.Vec[j] = Sum;
 	}
+
+	return VecOut;
 }
 
 void CMeshManager::Init_MeshManager(HWND hWnd)
@@ -167,18 +171,16 @@ void CMeshManager::Update_MeshManager()
 
 	for (UINT i = 0; i < m_VertCount; i++)
 	{
-		vector3 Vec1, Vec2;
-		Vec3_Mat4x4_Mul(Vec1, m_VertBuff[i], MatRotateX);
-		Vec3_Mat4x4_Mul(Vec2, Vec1, MatRotateY);
-		Vec3_Mat4x4_Mul(Vec1, Vec2, MatWorld);
-		Vec3_Mat4x4_Mul(Vec2, Vec1, MatProj);
+		vector3 VecTemp = Vec3_Mat4x4_Mul(m_VertBuff[i], MatRotateY);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatWorld);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatProj);
 
-		Vec2.x = Vec2.x / Vec2.z;
-		Vec2.y = Vec2.y / Vec2.z;
+		VecTemp.x = VecTemp.x / VecTemp.z;
+		VecTemp.y = VecTemp.y / VecTemp.z;
 
-		Vec3_Mat4x4_Mul(Vec1, Vec2, MatScreen);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatScreen);
 
-		m_VertBuffTransformed[i] = Vec1;
+		m_VertBuffTransformed[i] = VecTemp;
 	}
 }
 
@@ -188,11 +190,11 @@ void CMeshManager::Draw_MeshManager ()
 
     for (UINT i = 0; i < m_TriangleCount; i++)
     {
-		vector3 Vec1 = m_VertBuffTransformed[m_IndexBuff[i * 3]];
+		vector3 Vec1 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 0]];
 		vector3 Vec2 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 1]];
 		vector3 Vec3 = m_VertBuffTransformed[m_IndexBuff[i * 3 + 2]];
 
-		tex_coord2 Tex1 = m_TexCoord[m_IndexBuff[i * 3]];
+		tex_coord2 Tex1 = m_TexCoord[m_IndexBuff[i * 3 + 0]];
 		tex_coord2 Tex2 = m_TexCoord[m_IndexBuff[i * 3 + 1]];
 		tex_coord2 Tex3 = m_TexCoord[m_IndexBuff[i * 3 + 2]];
 
@@ -234,9 +236,9 @@ void CMeshManager::Read_BMP_File(const char *TexFileName)
 	m_TextureHeight = bih.biHeight;
 }
 
-void CMeshManager::Draw_Textured_Triangle(vector3 Vec1, tex_coord2 Tex1,
-						  vector3 Vec2, tex_coord2 Tex2,
-						  vector3 Vec3, tex_coord2 Tex3)
+void CMeshManager::Draw_Textured_Triangle(vector3 VecIn1, tex_coord2 TexIn1,
+						  vector3 VecIn2, tex_coord2 TexIn2,
+						  vector3 VecIn3, tex_coord2 TexIn3)
 {
 	int Side;
 	float x1, x2, x3;
@@ -244,23 +246,23 @@ void CMeshManager::Draw_Textured_Triangle(vector3 Vec1, tex_coord2 Tex1,
 	float iz1, uiz1, viz1, iz2, uiz2, viz2, iz3, uiz3, viz3;
 	float Temp;
 	
-	x1 = Vec1.x;
-	y1 = Vec1.y;
-	x2 = Vec2.x;
-	y2 = Vec2.y;
-	x3 = Vec3.x;
-	y3 = Vec3.y;
+	x1 = VecIn1.x;
+	y1 = VecIn1.y;
+	x2 = VecIn2.x;
+	y2 = VecIn2.y;
+	x3 = VecIn3.x;
+	y3 = VecIn3.y;
 	
-	iz1 = 1.0f / Vec1.z;
-	iz2 = 1.0f / Vec2.z;
-	iz3 = 1.0f / Vec3.z;
+	iz1 = 1.0f / VecIn1.z;
+	iz2 = 1.0f / VecIn2.z;
+	iz3 = 1.0f / VecIn3.z;
 	
-	uiz1 = Tex1.tu * iz1;
-	viz1 = Tex1.tv * iz1;
-	uiz2 = Tex2.tu * iz2;
-	viz2 = Tex2.tv * iz2;
-	uiz3 = Tex3.tu * iz3;
-	viz3 = Tex3.tv * iz3;
+	uiz1 = TexIn1.tu * iz1;
+	viz1 = TexIn1.tv * iz1;
+	uiz2 = TexIn2.tu * iz2;
+	viz2 = TexIn2.tv * iz2;
+	uiz3 = TexIn3.tu * iz3;
+	viz3 = TexIn3.tv * iz3;
 
 	#define swapfloat(x, y) Temp = x; x = y; y = Temp;
 
@@ -393,12 +395,8 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 	float ui, vi, zi;
 	float du, dv, dz;
 	
-	for (int yi = y1; yi<y2; yi++)
+	for (int y = y1; y<y2; y++)
 	{
-		ui = m_ul;
-		vi = m_vl;
-		zi = m_zl;
-
 		if ((m_xr - m_xl)>0)
 		{
 			du = (m_ur - m_ul)/(m_xr - m_xl);
@@ -411,8 +409,16 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 			dv = 0;
 			dz = 0;
 		}
+
+		int xln = (int)m_xl;
+
+		float dxt = 1 - (m_xl - xln);
+
+		zi = m_zl + dxt * dz;
+		ui = m_ul + dxt * du;
+		vi = m_vl + dxt * dv;
 				
-		for (int xi=(int)m_xl; xi<(int)m_xr; xi++)
+		for (int x=(int)m_xl; x<(int)m_xr; x++)
 		{
 			float z = 1.0f/zi;
 			float u = ui * z;
@@ -425,9 +431,9 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 
 			t= t*3;
 
-			UINT Index =  yi * 4 * m_ViewWidth + xi * 4;
+			UINT Index =  y * 4 * m_ViewWidth + x * 4;
 
-			m_Data[Index] = (BYTE) m_Res[t]; // blue
+			m_Data[Index + 0] = (BYTE) m_Res[t + 0]; // blue
 			m_Data[Index + 1] = (BYTE) m_Res[t + 1]; // green
 			m_Data[Index + 2] = (BYTE) m_Res[t + 2]; // red
 			m_Data[Index + 3] = 0; 
@@ -481,10 +487,9 @@ void CMeshManager::Clear_Backbuffer()
 		{
 			int Index = i * 4 * m_ViewWidth + j * 4;
 
-			m_Data[Index] = (BYTE) (255.0 * 0.3f); // blue
+			m_Data[Index + 0] = (BYTE) (255.0 * 0.3f); // blue
 			m_Data[Index + 1] = (BYTE)(255.0 * 0.125f); // green
 			m_Data[Index + 2] = 0; // red
-
 			m_Data[Index + 3] = 0; 
 		}
 	}

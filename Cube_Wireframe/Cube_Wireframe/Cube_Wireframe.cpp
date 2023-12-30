@@ -66,50 +66,66 @@ enum {	M00, M01, M02, M03,
 
 typedef float matrix4x4[16];
 
-void Vec3_Mat4x4_Mul(vector3 & VecOut, vector3 & Vec, matrix4x4 Mat)
+vector3 Vec3_Mat4x4_Mul(vector3 & VecIn, matrix4x4 MatIn)
 {
-	VecOut.x =	Vec.x * Mat[M00] +
-				Vec.y * Mat[M10] +
-				Vec.z * Mat[M20] +
-					    Mat[M30];
+	vector3 VecOut;
 
-	VecOut.y =	Vec.x * Mat[M01] +
-				Vec.y * Mat[M11] +
-				Vec.z * Mat[M21] +
-					    Mat[M31];
+	VecOut.x =	VecIn.x * MatIn[M00] +
+				VecIn.y * MatIn[M10] +
+				VecIn.z * MatIn[M20] +
+					    MatIn[M30];
 
-	VecOut.z =	Vec.x * Mat[M02] +
-				Vec.y * Mat[M12] +
-				Vec.z * Mat[M22] +
-					    Mat[M32];
+	VecOut.y =	VecIn.x * MatIn[M01] +
+				VecIn.y * MatIn[M11] +
+				VecIn.z * MatIn[M21] +
+					    MatIn[M31];
+
+	VecOut.z =	VecIn.x * MatIn[M02] +
+				VecIn.y * MatIn[M12] +
+				VecIn.z * MatIn[M22] +
+					    MatIn[M32];
+
+	return VecOut;
 }
 
-float Vec3_Dot(vector3& Vec1, vector3& Vec2)
+float Vec3_Dot(vector3& VecIn1, vector3& VecIn2)
 {
-	return Vec1.x * Vec2.x + Vec1.y * Vec2.y + Vec1.z * Vec2.z;
+	return VecIn1.x * VecIn2.x + VecIn1.y * VecIn2.y + VecIn1.z * VecIn2.z;
 }
 
-void Vec3_Normalize(vector3& VecOut, vector3& Vec)
+vector3 Vec3_Normalize(vector3& VecIn)
 {
-	float Len = sqrtf((Vec.x * Vec.x) + (Vec.y * Vec.y) + (Vec.z * Vec.z));
+	vector3 VecOut;
 
-	VecOut.x = Vec.x / Len;
-	VecOut.y = Vec.y / Len;
-	VecOut.z = Vec.z / Len;
+	float Len = sqrtf((VecIn.x * VecIn.x) + (VecIn.y * VecIn.y) + (VecIn.z * VecIn.z));
+
+	VecOut.x = VecIn.x / Len;
+	VecOut.y = VecIn.y / Len;
+	VecOut.z = VecIn.z / Len;
+
+	return VecOut;
 };
 
-void Vec3_Cross(vector3& VecOut, vector3& Vec1, vector3& Vec2)
+vector3 Vec3_Cross(vector3& VecIn1, vector3& VecIn2)
 {
-	VecOut.x = Vec1.y * Vec2.z - Vec1.z * Vec2.y;
-	VecOut.y = Vec1.z * Vec2.x - Vec1.x * Vec2.z;
-	VecOut.z = Vec1.x * Vec2.y - Vec1.y * Vec2.x;
+	vector3 VecOut;
+
+	VecOut.x = VecIn1.y * VecIn2.z - VecIn1.z * VecIn2.y;
+	VecOut.y = VecIn1.z * VecIn2.x - VecIn1.x * VecIn2.z;
+	VecOut.z = VecIn1.x * VecIn2.y - VecIn1.y * VecIn2.x;
+
+	return VecOut;
 }
 
-void Vec3_Subtract(vector3& VecOut, vector3& Vec1, vector3& Vec2)
+vector3 Vec3_Subtract(vector3& VecIn1, vector3& VecIn2)
 {
-	VecOut.x = Vec1.x - Vec2.x;
-	VecOut.y = Vec1.y - Vec2.y;
-	VecOut.z = Vec1.z - Vec2.z;
+	vector3 VecOut;
+
+	VecOut.x = VecIn1.x - VecIn2.x;
+	VecOut.y = VecIn1.y - VecIn2.y;
+	VecOut.z = VecIn1.z - VecIn2.z;
+
+	return VecOut;
 }
 
 void Draw_Cube()
@@ -132,21 +148,21 @@ void Draw_Cube()
 	//MATRIX VIEW CALCULATION
 	vector3 VecRight = { 1.0f, 0.0f, 0.0 };
 	vector3 VecUp = { 0.0f, 1.0f, 0.0f }; 
-	vector3 VecPos = { 0.0f, 10.0f, 0.0f };
-	vector3 VecModelPos = { 0.0, 0.0, 15.0 };
+	vector3 VecCamPos = { 0.0f, 10.0f, 0.0f };
+	vector3 VecModelPos = { 0.0, 0.0, 15.0f };
 	vector3 VecLook;
-	Vec3_Subtract(VecLook, VecModelPos, VecPos);
+	VecLook = Vec3_Subtract(VecModelPos, VecCamPos);
 
-	Vec3_Normalize(VecLook, VecLook);
+	VecLook = Vec3_Normalize(VecLook);
 
-	Vec3_Cross(VecUp, VecLook, VecRight);
-	Vec3_Normalize(VecUp, VecUp);
-	Vec3_Cross(VecRight, VecUp, VecLook);
-	Vec3_Normalize(VecRight, VecRight);
+	VecUp = Vec3_Cross(VecLook, VecRight);
+	VecUp = Vec3_Normalize(VecUp);
+	VecRight = Vec3_Cross(VecUp, VecLook);
+	VecRight = Vec3_Normalize(VecRight);
 
-	float xp = -Vec3_Dot(VecPos, VecRight);
-	float yp = -Vec3_Dot(VecPos, VecUp);
-	float zp = -Vec3_Dot(VecPos, VecLook);
+	float xp = -Vec3_Dot(VecCamPos, VecRight);
+	float yp = -Vec3_Dot(VecCamPos, VecUp);
+	float zp = -Vec3_Dot(VecCamPos, VecLook);
 
 	matrix4x4 MatView = {
 		VecRight.x,		VecUp.x,	VecLook.x,		0.0,
@@ -200,18 +216,17 @@ void Draw_Cube()
 
 	for (int i = 0; i < NUM_VERTICES; i++)
 	{
-		vector3 Vec1, Vec2;
-		Vec3_Mat4x4_Mul(Vec1, g_VertBuff[i], MatRotateY);
-		Vec3_Mat4x4_Mul(Vec2, Vec1, MatWorld);
-		Vec3_Mat4x4_Mul(Vec1, Vec2, MatView);
-		Vec3_Mat4x4_Mul(Vec2, Vec1, MatProj);
+		vector3 VecTemp = Vec3_Mat4x4_Mul(g_VertBuff[i], MatRotateY);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatWorld);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatView);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatProj);
 
-		Vec2.x = Vec2.x / Vec2.z;
-		Vec2.y = Vec2.y / Vec2.z;
+		VecTemp.x = VecTemp.x / VecTemp.z;
+		VecTemp.y = VecTemp.y / VecTemp.z;
 
-		Vec3_Mat4x4_Mul(Vec1, Vec2, MatScreen);
+		VecTemp = Vec3_Mat4x4_Mul(VecTemp, MatScreen);
 		
-		g_VertBuffTransformed[i] = Vec1;
+		g_VertBuffTransformed[i] = VecTemp;
 	}
 
 	HDC hDC = GetDC(g_hWnd);
@@ -226,7 +241,7 @@ void Draw_Cube()
 
 	for (int i = 0; i < NUM_LINES; i++)
 	{
-		vector3 Vec1 = g_VertBuffTransformed[g_IndexBuff[i * 2]];
+		vector3 Vec1 = g_VertBuffTransformed[g_IndexBuff[i * 2 + 0]];
 		vector3 Vec2 = g_VertBuffTransformed[g_IndexBuff[i * 2 + 1]];
 
 		MoveToEx(hDC, (int)Vec1.x, (int)Vec1.y, NULL);

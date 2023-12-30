@@ -25,10 +25,7 @@
 
 #define PI 3.14159265358979f
 
-struct matrix4x4
-{
-	float Mat[4][4];
-};
+typedef float matrix4x4[4][4];
 
 struct tex_coord2
 {
@@ -87,10 +84,10 @@ private:
 	ID3D12Resource* CurrentBackBuffer();
 	
 	void Read_BMP_File(const char* szTexFileName);
-	vector3 Vec3_Mat4x4_Mul(vector3 v, matrix4x4 m);
-	void Draw_Textured_Triangle(vector3 v1, tex_coord2 t1,
-		vector3 v2, tex_coord2 t2,
-		vector3 v3, tex_coord2 t3);
+	vector3 Vec3_Mat4x4_Mul(vector3 &VecIn, matrix4x4 MatIn);
+	void Draw_Textured_Triangle(vector3 VecIn1, tex_coord2 TexIn1,
+		vector3 VecIn2, tex_coord2 TexIn2,
+		vector3 VecIn3, tex_coord2 TexIn3);
 	void Draw_Textured_Poly(int y1, int y2);
 	
 	void Draw_MeshManager2();
