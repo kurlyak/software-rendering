@@ -806,7 +806,7 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 {
 	int x1, x2;
 	//int dx;
-	float dx;
+	int dx;
 	float ui, vi, zi;
 	float du, dv, dz;
 
@@ -822,11 +822,11 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 		vi = m_vl;
 		zi = m_zl;
 
-		if ((dx = (m_xr - m_xl)) > 0)
+		if ((dx = (x2 - x1)) > 0)
 		{
-			du = (m_ur - m_ul)/dx;
-			dv = (m_vr - m_vl)/dx;
-			dz = (m_zr - m_zl)/dx;
+			du = (m_ur - m_ul) / (m_xr - m_xl);
+			dv = (m_vr - m_vl) / (m_xr - m_xl);
+			dz = (m_zr - m_zl) / (m_xr - m_xl);
 		}
 		else
 		{
@@ -843,7 +843,7 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 		
 		if(x1 < MinClipX)
 		{
-			dx = (float) MinClipX-x1;
+			dx = MinClipX-x1;
 
 			ui+=dx * du;
 			vi+=dx * dv;
