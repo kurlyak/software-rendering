@@ -805,7 +805,6 @@ void CMeshManager::Draw_Textured_Triangle(vector4 VecIn1,
 void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 {
 	int x1, x2;
-	//int dx;
 	int dx;
 	float ui, vi, zi;
 	float du, dv, dz;
@@ -817,10 +816,6 @@ void CMeshManager::Draw_Textured_Poly(int y1, int y2)
 	{
 		x1 = (int)m_xl;
 		x2 = (int)m_xr;
-
-		ui = m_ul;
-		vi = m_vl;
-		zi = m_zl;
 
 		if ((dx = (x2 - x1)) > 0)
 		{
